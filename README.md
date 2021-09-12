@@ -1,0 +1,1 @@
+Konstruktors-paraļu ģenerātors
