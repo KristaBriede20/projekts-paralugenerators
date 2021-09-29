@@ -35,7 +35,7 @@ par_ievade.pack(pady=20)
 frame = Frame(base, background="black")
 frame.pack(pady=20)
 
-#izveido paroļu ģenerēsānas pogu
+#Izveido paroļu ģenerēsānas pogu
 button = Button(frame, text="Ģenerēt jaunu paroli", command=paroles)
 button.grid(row=0, column=0, padx=10)
 
