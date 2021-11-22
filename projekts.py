@@ -11,16 +11,27 @@ from configparser import ConfigParser
 garums = []
 gen_par = []
 
-with open(r"C:\Users\Default.DESKTOP-NKF7PFE\Desktop\projekts-paroles\conf.yaml", 'r') as stream:  
+with open(r"./conf.yaml") as stream:  
     config = yaml.safe_load(stream)
 
 logging.config.dictConfig(config)
 logger = logging.getLogger('root')
 
-connection = sqlite3.connect(r"C:\Users\Default.DESKTOP-NKF7PFE\Desktop\projekts-paroles\database.db")
+connection = sqlite3.connect(r"database/database.db")
 cursor = connection.cursor()
 
-cursor.execute('CREATE TABLE IF NOT EXISTS "paroles"("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, "garums" INTEGER NOT NULL, "parole" TEXT NOT NULL UNIQUE)')
+try:
+    config = ConfigParser()
+    config.read('config.ini')
+
+    default_password_length = int(config.get('generator', 'default_password_length'))
+    min_ascii = int(config.get('generator', 'min_ascii'))
+    max_ascii = int(config.get('generator', 'max_ascii'))
+    create_query = config.get('database', 'create_query')
+except:
+    logger.error(logging.error)
+
+cursor.execute(create_query)
 logger.info("DATA")
 
 logger.info('Programma tiek palaista')
@@ -39,24 +50,20 @@ if __name__ == "__main__":
         
         parole = ''
         
+        if par_garums == '':
+            par_garums = default_password_length
 
         for p in range(par_garums) :
-            parole += chr(randint(1,555))
+            parole += chr(randint(min_ascii,max_ascii))
 
     
         par_ievade.insert(0, parole)
         gen_par.append(parole)
-        
-        
-        
-    for dataID in enumerate(garums):
-        lastID = cursor.lastrowid
-        cursor.execute('INSERT INTO paroles(garums, parole) VALUES(?, ?)', (dataID + 1, gen_par[dataID],))
+        print(parole)
 
-        cursor.execute('SELECT * FROM paroles')
-    for x in cursor:
-        print(x)
-        
+        cursor.execute('INSERT INTO paroles(garums, parole) VALUES(?, ?)', (par_garums, parole,))
+        connection.commit()
+        logger.info('Parole ievietota datubāzē')
         
 #Izveido label frame
     label = LabelFrame(base,background="red", text="Number of characters?")
@@ -78,11 +85,10 @@ if __name__ == "__main__":
     button = Button(frame, text="Ģenerēt jaunu paroli", command=paroles)
     button.grid(row=0, column=0, padx=10)
     
-connection.commit()
-cursor.close()
+#connection.commit()
+logger.info('Commited')
+#cursor.close()
 
 #Palaiž
 base.mainloop()
 logger.info('Programma aizvērta')
-
-
