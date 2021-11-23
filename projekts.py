@@ -27,11 +27,9 @@ try:
     default_password_length = int(config.get('generator', 'default_password_length'))
     min_ascii = int(config.get('generator', 'min_ascii'))
     max_ascii = int(config.get('generator', 'max_ascii'))
-    create_query = config.get('database', 'create_query')
 except:
     logger.error(logging.error)
 
-cursor.execute(create_query)
 logger.info("DATA")
 
 logger.info('Programma tiek palaista')
@@ -44,7 +42,10 @@ if __name__ == "__main__":
 #Ģenerē jaunu paroli
     def paroles() :
         par_ievade.delete(0, END)
-        par_garums = int(ievade.get())
+        try:
+            par_garums = int(ievade.get())
+        except:
+            par_garums = default_password_length
         logger.info('Izvēlēts paroles garums: ' + str(par_garums))
         garums.append(par_garums)
         
@@ -64,6 +65,7 @@ if __name__ == "__main__":
         cursor.execute('INSERT INTO paroles(garums, parole) VALUES(?, ?)', (par_garums, parole,))
         connection.commit()
         logger.info('Parole ievietota datubāzē')
+        return 0
         
 #Izveido label frame
     label = LabelFrame(base,background="red", text="Number of characters?")
